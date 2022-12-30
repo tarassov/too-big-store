@@ -1,57 +1,49 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
+import React, {useEffect, useRef, useState} from 'react';
 import './App.css';
+import {useAppDispatch} from "./store";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
+    const dispatch = useAppDispatch()
+
+    const [log, setLog] = useState<Array<string>>([])
+    const add = (text: string)=>{
+        setLog([...log,text])
+    }
+
+    const getProject = async ()=>{
+        add('loading a lot of data to the redux store');
+        const newState = [];
+        let i;
+        for (i=0; i<100000; i++){
+            newState.push(i.toString());
+        }
+        dispatch({type:"project", payload: {project:newState}})
+        add(`data loaded: ${i} strings`)
+    }
+    const dummy = async ()=>{
+        add('start dummy dispatch')
+        const t0 = performance.now()
+        dispatch({type:"hey"})
+        const t1 = performance.now()
+        add(`Time it takes to run the function: ${t1 - t0} ms`)
+    }
+
+    const clear = async ()=>{
+        dispatch({type:"project", payload: {project:[]}})
+        setLog([])
+    }
+
+  return (<>
+
+          <div style={{display: "flex", gap: "30px", margin: "10px"}}>
+              <button onClick={getProject}>Load data</button>
+              <button onClick={dummy}>Dispatch empty action</button>
+              <button onClick={clear}>Clear</button>
+          </div>
+          {log.map((l,i)=>{
+              return<div key={i}>{l}</div>
+          })}
+      </>
   );
 }
 
